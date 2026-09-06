@@ -2060,8 +2060,8 @@ if [ "$INSTALL_CLAUDE" -eq 1 ]; then
     _OGB_LINK="$INSTALL_SKILLS_DIR/connect-chrome"
     _OGB_ALIAS_NAME="connect-chrome"
     if [ "$SKILL_PREFIX" -eq 1 ]; then
-      _OGB_LINK="$INSTALL_SKILLS_DIR/gstack-connect-chrome"
-      _OGB_ALIAS_NAME="gstack-connect-chrome"
+      _OGB_LINK="$INSTALL_SKILLS_DIR/${SKILL_NS}connect-chrome"
+      _OGB_ALIAS_NAME="${SKILL_NS}connect-chrome"
     fi
     _install_alias_skill_md "$SOURCE_GSTACK_DIR/open-gstack-browser/SKILL.md" "$_OGB_LINK" "$_OGB_ALIAS_NAME"
     if [ "$LOCAL_INSTALL" -eq 1 ]; then
@@ -2133,8 +2133,8 @@ if [ "$INSTALL_CLAUDE" -eq 1 ]; then
       _OGB_LINK="$INSTALL_SKILLS_DIR/connect-chrome"
       _OGB_ALIAS_NAME="connect-chrome"
       if [ "$SKILL_PREFIX" -eq 1 ]; then
-        _OGB_LINK="$INSTALL_SKILLS_DIR/gstack-connect-chrome"
-        _OGB_ALIAS_NAME="gstack-connect-chrome"
+        _OGB_LINK="$INSTALL_SKILLS_DIR/${SKILL_NS}connect-chrome"
+        _OGB_ALIAS_NAME="${SKILL_NS}connect-chrome"
       fi
       _install_alias_skill_md "$SOURCE_GSTACK_DIR/open-gstack-browser/SKILL.md" "$_OGB_LINK" "$_OGB_ALIAS_NAME"
       log "gstack ready (claude)."
