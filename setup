@@ -23,8 +23,8 @@ Options:
   --host <name>     Install for a specific host (claude, codex, kiro, factory,
                     opencode, openclaw, hermes, gbrain, auto). Default: claude.
   --model <id>      Codex model profile override. Otherwise reads Codex config.
-  --prefix          Install skills with the gstack- prefix (e.g. /gstack-review).
-  --no-prefix       Install skills with short names (e.g. /review). Default.
+  --prefix          Install skills with the eo- prefix (e.g. /eo-review). Default.
+  --no-prefix       Install skills with short names (e.g. /review).
   --team            Switch to team mode (per-repo gstack with auto-update).
   --no-team         Force solo install even if a team-mode repo is detected.
   -q, --quiet       Suppress progress output.
@@ -35,7 +35,7 @@ Examples:
   ./setup --host codex             # install for OpenAI Codex CLI
   ./setup --host codex --model gpt-5.6-sol
   ./setup --team                   # team mode for a shared repo
-  ./setup --no-prefix              # use short slash-command names
+  ./setup --no-prefix              # use short slash-command names (may collide)
 
 Docs: https://github.com/garrytan/gstack
 EOF
@@ -350,7 +350,12 @@ log() { [ "$QUIET" -eq 0 ] && echo "$@" || true; }
 HOST="claude"
 LOCAL_INSTALL=0
 SKILL_PREFIX=1
-SKILL_PREFIX_FLAG=0
+# EO-Stack fork: skills install namespaced (/eo-review, /eo-qa) by default so they
+# can never collide with skills already owned by another repo or skill pack.
+# SKILL_PREFIX_FLAG starts at 1 (not 0) so the interactive naming prompt is skipped;
+# `--no-prefix` still overrides it explicitly. Upstream default was flat names.
+SKILL_PREFIX_FLAG=1
+SKILL_NS="${EO_SKILL_NS:-eo-}"
 TEAM_MODE=0
 NO_TEAM_MODE=0
 PLAN_TUNE_HOOKS_MODE=""   # "" = resolve from env/config/prompt; "yes"/"no" = explicit
@@ -1221,11 +1226,14 @@ link_claude_skill_dirs() {
       # Use frontmatter name: if present (e.g., run-tests/ with name: test → symlink as "test")
       skill_name=$(grep -m1 '^name:' "$skill_dir/SKILL.md" 2>/dev/null | sed 's/^name:[[:space:]]*//' | tr -d '[:space:]')
       [ -z "$skill_name" ] && skill_name="$dir_name"
-      # Apply gstack- prefix unless --no-prefix or already prefixed
+      # Apply the $SKILL_NS prefix unless --no-prefix or already prefixed.
+      # A dir that is already namespaced upstream (gstack-upgrade) gets its
+      # legacy prefix swapped, not stacked: gstack-upgrade -> eo-upgrade.
       if [ "$SKILL_PREFIX" -eq 1 ]; then
         case "$skill_name" in
-          gstack-*) link_name="$skill_name" ;;
-          *)        link_name="gstack-$skill_name" ;;
+          "$SKILL_NS"*) link_name="$skill_name" ;;
+          gstack-*)     link_name="${SKILL_NS}${skill_name#gstack-}" ;;
+          *)            link_name="${SKILL_NS}${skill_name}" ;;
         esac
       else
         link_name="$skill_name"

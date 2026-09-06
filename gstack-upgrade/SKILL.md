@@ -176,7 +176,7 @@ PARENT=$(dirname "$INSTALL_DIR")
 # abort and let the human inspect, never delete it silently.
 [ -e "$INSTALL_DIR.bak" ] && { echo "ERROR: stale backup exists at $INSTALL_DIR.bak (from a previous failed upgrade?) — inspect it, salvage/remove it, then re-run." >&2; exit 1; }
 TMP_DIR=$(mktemp -d) || { echo "ERROR: mktemp failed — aborting upgrade (install untouched)." >&2; exit 1; }
-git clone --depth 1 https://github.com/garrytan/gstack.git "$TMP_DIR/gstack" || { echo "ERROR: clone failed — aborting upgrade (install untouched)." >&2; rm -rf "$TMP_DIR"; exit 1; }
+git clone --depth 1 https://github.com/funnel91/EO-Stack.git "$TMP_DIR/gstack" || { echo "ERROR: clone failed — aborting upgrade (install untouched)." >&2; rm -rf "$TMP_DIR"; exit 1; }
 mv "$INSTALL_DIR" "$INSTALL_DIR.bak"
 if mv "$TMP_DIR/gstack" "$INSTALL_DIR"; then
   cd "$INSTALL_DIR" && ./setup

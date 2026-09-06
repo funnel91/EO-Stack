@@ -1,3 +1,12 @@
+# The EO Stack
+
+> Our fork of [gstack](https://github.com/garrytan/gstack) (Garry Tan, MIT). Skills install as
+> `/eo-review`, `/eo-qa`, `/eo-ship`. See **[EO-STACK.md](EO-STACK.md)** for what we changed,
+> how to install it without disturbing the other projects, and which skills actually matter.
+> Everything below is upstream's README, unmodified.
+
+---
+
 # gstack
 
 > "I don't think I've typed like a line of code probably since December, basically, which is an extremely large change." — [Andrej Karpathy](https://fortune.com/2026/03/21/andrej-karpathy-openai-cofounder-ai-agents-coding-state-of-psychosis-openclaw/), No Priors podcast, March 2026
