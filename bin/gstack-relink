@@ -10,6 +10,10 @@
 #   GSTACK_SKILLS_DIR  — override target skills directory
 set -euo pipefail
 
+# EO-Stack fork: the skill namespace. Must match setup's SKILL_NS and
+# gstack-patch-names' NS, or relink recreates a duplicate set of entries.
+SKILL_NS="${EO_SKILL_NS:-eo-}"
+
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 GSTACK_CONFIG="${SCRIPT_DIR}/gstack-config"
 
@@ -302,19 +306,28 @@ for skill_dir in "$INSTALL_DIR"/*/; do
   [ -f "$skill_dir/SKILL.md" ] || continue
 
   if [ "$PREFIX" = "true" ]; then
-    # Don't double-prefix directories already named gstack-*
+    # Same namespace + swap-don't-stack rule as setup and gstack-patch-names.
+    # These three MUST agree: relink running with its own hardcoded prefix is
+    # what left a full set of gstack-* duplicates beside the eo-* entries.
     case "$skill" in
-      gstack-*) link_name="$skill" ;;
-      *)        link_name="gstack-$skill" ;;
+      "$SKILL_NS"*) link_name="$skill" ;;
+      gstack-*)     link_name="${SKILL_NS}${skill#gstack-}" ;;
+      *)            link_name="${SKILL_NS}${skill}" ;;
     esac
     # Remove old flat entry if it exists (and isn't the same as the new link)
     [ "$link_name" != "$skill" ] && _cleanup_skill_entry "$SKILLS_DIR/$skill" "$skill"
+    # Reap a legacy gstack-* entry this skill used to install under.
+    case "$skill" in
+      gstack-*) ;;
+      *) [ "$link_name" != "gstack-$skill" ] && _cleanup_skill_entry "$SKILLS_DIR/gstack-$skill" "$skill" ;;
+    esac
   else
     link_name="$skill"
     # Don't remove gstack-* dirs that are their real name (e.g., gstack-upgrade)
     case "$skill" in
       gstack-*) ;; # Already the real name, no old prefixed link to clean
-      *)        _cleanup_skill_entry "$SKILLS_DIR/gstack-$skill" "$skill" ;;
+      *)        _cleanup_skill_entry "$SKILLS_DIR/${SKILL_NS}${skill}" "$skill"
+                _cleanup_skill_entry "$SKILLS_DIR/gstack-$skill" "$skill" ;;
     esac
   fi
   target="$SKILLS_DIR/$link_name"
